@@ -15,8 +15,12 @@ def load_resources():
     # Mendefinisikan path folder model
     model_path = 'models'
     
+    # Memuat scaler
     scaler = joblib.load(os.path.join(model_path, 'scaler.pkl'))
-    dae_model = load_model(os.path.join(model_path, 'dae_model.h5'))
+    # SOLUSI: Tambahkan parameter compile=False
+    # Ini akan menghindari error deserialisasi metrik karena kita hanya butuh bobot untuk prediksi
+    dae_model = load_model(os.path.join(model_path, 'dae_model.h5'), compile=False)
+    # Memuat Stacking Classifier
     stacking_model = joblib.load(os.path.join(model_path, 'stacking_model.pkl'))
     
     return scaler, dae_model, stacking_model
@@ -69,4 +73,5 @@ if st.button("Lakukan Prediksi"):
     if prediction[0] == 1:
         st.error(f"### Hasil Prediksi: Positif (Probabilitas: {probabilitas[0][1]*100:.2f}%)")
     else:
+
         st.success(f"### Hasil Prediksi: Negatif (Probabilitas: {probabilitas[0][0]*100:.2f}%)")
