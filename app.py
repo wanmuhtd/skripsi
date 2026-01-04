@@ -9,17 +9,16 @@ from tensorflow.keras.models import load_model
 st.set_page_config(page_title="Prediksi Kesehatan ML", layout="wide")
 
 # --- FUNGSI LOAD MODEL ---
-# Menggunakan st.cache_resource agar model tidak di-load berulang kali setiap user berinteraksi
 @st.cache_resource
 def load_resources():
-    # Mendefinisikan path folder model
     model_path = 'models'
     
     # Memuat scaler
     scaler = joblib.load(os.path.join(model_path, 'scaler.pkl'))
-    # SOLUSI: Tambahkan parameter compile=False
-    # Ini akan menghindari error deserialisasi metrik karena kita hanya butuh bobot untuk prediksi
+    
+    # Memuat DAE dengan compile=False untuk menghindari error metrik
     dae_model = load_model(os.path.join(model_path, 'dae_model.h5'), compile=False)
+    
     # Memuat Stacking Classifier
     stacking_model = joblib.load(os.path.join(model_path, 'stacking_model.pkl'))
     
@@ -29,11 +28,15 @@ def load_resources():
 try:
     scaler, dae_model, stacking_model = load_resources()
 except Exception as e:
-    st.error(f"Gagal memuat model. Pastikan file berada di folder 'models/'. Error: {e}")
+    st.error(f"Gagal memuat model. Error: {e}")
 
 # --- ANTARMUKA PENGGUNA (UI) ---
 st.title("Sistem Klasifikasi Kesehatan")
-st.write("Aplikasi ini menggunakan integrasi **Denoising Autoencoder** dan **Stacking Classifier**.")
+st.markdown("""
+Aplikasi ini menggunakan logika **Kompensasi Fitur Otomatis**:
+- **Umur > 30**: Fitur diproses melalui **Denoising Autoencoder (DAE)** untuk kompensasi noise.
+- **Umur ≤ 30**: Fitur langsung diproses ke tahap klasifikasi tanpa DAE.
+""")
 
 # Layout Kolom untuk Input
 col1, col2 = st.columns(2)
@@ -51,27 +54,41 @@ with col2:
     insulin = st.number_input("Insulin", 0, 900, 80)
     bmi = st.number_input("BMI", 0.0, 70.0, 25.0)
     dpf = st.number_input("Diabetes Pedigree Function", 0.0, 3.0, 0.5)
+    # --- INPUT UMUR BARU ---
+    age = st.number_input("Age (Umur)", 1, 120, 25)
 
 # Tombol Prediksi
 if st.button("Lakukan Prediksi"):
-    # 1. Menyiapkan Data
+    # 1. Menyiapkan Data (Hanya 7 fitur yang sesuai dengan Scaler/Model)
+    # Catatan: Umur digunakan untuk logika IF, bukan input ke model (sesuai metadata scaler Anda)
     input_data = pd.DataFrame([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, dpf]],
                               columns=['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction'])
     
     # 2. Preprocessing (Scaling)
     input_scaled = scaler.transform(input_data)
     
-    # 3. Feature Transformation (DAE)
-    features_dae = dae_model.predict(input_scaled)
+    # 3. Logika Kondisional DAE Berdasarkan Umur
+    if age > 30:
+        st.info(f"💡 Info: Pasien berusia {age} tahun (>30). Mengaktifkan kompensasi fitur DAE.")
+        final_features = dae_model.predict(input_scaled)
+    else:
+        st.info(f"💡 Info: Pasien berusia {age} tahun (≤30). Data langsung diproses tanpa DAE.")
+        final_features = input_scaled
     
     # 4. Klasifikasi Akhir (Stacking)
-    prediction = stacking_model.predict(features_dae)
-    probabilitas = stacking_model.predict_proba(features_dae)
+    # Pastikan output DAE memiliki jumlah kolom yang sama dengan input aslinya
+    prediction = stacking_model.predict(final_features)
+    probabilitas = stacking_model.predict_proba(final_features)
     
     # --- TAMPILAN HASIL ---
     st.divider()
     if prediction[0] == 1:
         st.error(f"### Hasil Prediksi: Positif (Probabilitas: {probabilitas[0][1]*100:.2f}%)")
     else:
-
         st.success(f"### Hasil Prediksi: Negatif (Probabilitas: {probabilitas[0][0]*100:.2f}%)")
+
+    # Tambahan Informasi Teknis
+    with st.expander("Detail Alur Proses"):
+        st.write(f"1. Input Data: {input_data.values.tolist()}")
+        st.write(f"2. Data Scaled: {input_scaled.tolist()}")
+        st.write(f"3. DAE Active: {'Ya' if age > 30 else 'Tidak'}")
