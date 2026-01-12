@@ -21,41 +21,45 @@ st.set_page_config(
 # ======================================================
 st.markdown("""
 <style>
-/* Mengubah warna background utama */
+/* Overall Page Styling */
 .stApp {
-    background-color: #0e1117;
-    color: #fafafa;
+    background-color: #181c20;
+    color: #f0f0f0;
 }
 
 /* Sidebar Styling */
 [data-testid="stSidebar"] {
-    background-color: #161b22;
+    background-color: #23272b;
     border-right: 1px solid #30363d;
 }
 
-/* Card Style untuk Input & Hasil */
+/* Card Styling */
 .custom-card {
-    background-color: #1c2128;
+    background-color: #2b3036;
     padding: 25px;
     border-radius: 12px;
-    border: 1px solid #30363d;
+    border: 1px solid #3c4449;
     margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Header & Text */
+/* Headings */
 h1, h2, h3 {
     color: #ffffff !important;
 }
 
+/* Markdown Text */
 .stMarkdown {
     color: #adbac7;
 }
 
-/* Input Fields Styling */
+/* Input Field Styling */
 .stNumberInput div[data-baseweb="input"] {
-    background-color: #22272e !important;
+    background-color: #2f353d !important;
     border-color: #444c56 !important;
     color: white !important;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 /* Button Styling */
@@ -65,33 +69,43 @@ h1, h2, h3 {
     background: linear-gradient(45deg, #238636, #2ea043);
     color: white;
     border: none;
-    padding: 10px;
+    padding: 12px;
     font-weight: bold;
-    transition: 0.3s;
+    transition: 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .stButton>button:hover {
     background: linear-gradient(45deg, #2ea043, #3fb950);
     border: none;
     color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* Tab Styling */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
+    border-bottom: 2px solid #444c56;
 }
 
 .stTabs [data-baseweb="tab"] {
     height: 50px;
-    background-color: #1c2128;
+    background-color: #2f353d;
     border-radius: 8px 8px 0px 0px;
     color: #adbac7;
-    border: 1px solid #30363d;
+    border: 1px solid #3c4449;
+    padding: 10px;
+    text-align: center;
 }
 
 .stTabs [aria-selected="true"] {
     background-color: #238636 !important;
     color: white !important;
+}
+
+.stTabs [aria-selected="false"]:hover {
+    background-color: #444c56 !important;
+    cursor: pointer;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -102,7 +116,6 @@ h1, h2, h3 {
 @st.cache_resource
 def load_resources():
     model_path = "models"
-    # Pastikan file-file ini ada di folder /models
     scaler = joblib.load(os.path.join(model_path, "scaler.pkl"))
     dae_model = load_model(os.path.join(model_path, "dae_model.h5"), compile=False)
     stacking_model = joblib.load(os.path.join(model_path, "stacking_model.pkl"))
@@ -118,7 +131,7 @@ except Exception as e:
 # 4. SIDEBAR
 # ======================================================
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/2864/2864275.png", width=80)  # Opsional: Icon
+    st.image("https://cdn-icons-png.flaticon.com/512/2864/2864275.png", width=80)  # Icon
     st.markdown("### Diabetes AI System")
     st.caption("Clinical Decision Support System")
     st.divider()
@@ -141,12 +154,11 @@ st.markdown("Implementasi Model **Stacking Ensemble** dengan Fitur Terkompensasi
 tab1, tab2 = st.tabs(["🔍 Prediction Tool", "📚 Methodology"])
 
 with tab1:
-    # Menggunakan container agar background card terlihat
+    # Container for Background Card Styling
     with st.container():
         st.markdown('<div class="custom-card">', unsafe_allow_html=True)
         st.subheader("Patient Clinical Parameters")
 
-        # Layout input dalam kolom agar rapi
         col1, col2, col3 = st.columns(3)
         with col1:
             pregnancies = st.number_input("Pregnancies", 0, 20, 1)
@@ -163,11 +175,11 @@ with tab1:
 
     if st.button("Analyze Diabetes Risk"):
         with st.spinner("Calculating..."):
-            # Logika Pemrosesan Data
+            # Logic for Data Processing
             feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction"]
             input_data = pd.DataFrame([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, dpf]], columns=feature_names)
 
-            # Imputasi Median
+            # Median Imputation
             medians = {"Glucose": 117.0, "BloodPressure": 72.0, "SkinThickness": 29.0, "Insulin": 131.0, "BMI": 32.05}
             for col, val in medians.items():
                 if input_data[col][0] == 0: input_data[col] = val
@@ -179,7 +191,7 @@ with tab1:
                 features_dae_scaled = dae_model.predict(input_scaled, verbose=0)
                 final_features = features_dae_scaled
 
-                # Plotly Comparison (Transparan)
+                # Plotly Comparison (Transparent)
                 features_dae_original = scaler.inverse_transform(features_dae_scaled)
                 fig = go.Figure()
                 fig.add_bar(name="Input Asli", x=feature_names, y=input_data.values[0], marker_color='#444c56')
@@ -194,11 +206,11 @@ with tab1:
                 final_features = input_scaled
                 st.info("ℹ️ Kelompok usia ≤ 30: Fitur diolah tanpa kompensasi DAE.")
 
-            # Prediksi Akhir
+            # Final Prediction
             prediction = stacking_model.predict(final_features)[0]
             prob = stacking_model.predict_proba(final_features)[0]
 
-            # Hasil dalam Card
+            # Display Results
             st.markdown('<div class="custom-card">', unsafe_allow_html=True)
             res_col1, res_col2 = st.columns(2)
 
