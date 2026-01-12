@@ -6,4 +6,3 @@ tensorflow
 joblib
 xgboost
 plotly
-matplotlib.pyplot
