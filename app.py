@@ -101,21 +101,27 @@ with tab1:
 
     with col_viz:
         if predict_btn:
-            # --- LOGIC PROCESSING ---
-            feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DPF"]
+             # --- LOGIC PROCESSING ---
+            # Pastikan urutan kolom ini SAMA PERSIS dengan saat Anda melakukan training model
+            feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction"]
             raw_data = [preg, glu, bp, stk, ins, bmi, dpf]
+            
+            # Buat DataFrame
             df_raw = pd.DataFrame([raw_data], columns=feature_names)
             
-            # 1. Median Imputation (Preprocessing)
+            # 1. Median Imputation (Gunakan nilai dari hasil observasi data training)
             medians = {"Glucose": 117.0, "BloodPressure": 72.0, "SkinThickness": 29.0, "Insulin": 131.0, "BMI": 32.05}
             for col, val in medians.items():
-                if df_raw[col][0] == 0: df_raw[col] = val
-
-            # 2. SCALING (Penting: Transformasi data ke skala model)
-            scaled_input = scaler.transform(df_raw)
+                if df_raw[col][0] == 0: 
+                    df_raw[col] = val
             
-            # 3. DAE Processing (Jika usia > 30)
+            # 2. SCALING (SOLUSI: Gunakan .values agar tidak error nama kolom)
+            # Ini akan mengubah DataFrame menjadi array [1, 7] tanpa membawa nama kolom
+            scaled_input = scaler.transform(df_raw.values) 
+            
+            # 3. DAE Processing
             if age > 30:
+                # Lakukan hal yang sama jika model DAE Anda juga sensitif terhadap nama kolom
                 scaled_dae = dae_model.predict(scaled_input, verbose=0)
                 final_features = scaled_dae
                 is_compensated = True
@@ -186,3 +192,4 @@ with tab2:
     4. **Stacking Ensemble**: Prediksi akhir dihasilkan oleh model ensemble yang menggabungkan beberapa algoritma klasifikasi.
     """)
     st.markdown('</div>', unsafe_allow_html=True)
+
