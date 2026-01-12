@@ -35,7 +35,7 @@ st.markdown("""
         background-color: #161b22 !important;
         border: 1px solid #30363d !important;
         border-radius: 12px !important;
-        padding: 25px !important;
+        padding: 16px !important;
         min-height: 580px !important; /* Tinggi dikunci agar simetris */
         display: flex;
         flex-direction: column;
@@ -227,4 +227,5 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
