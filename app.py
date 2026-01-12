@@ -252,4 +252,4 @@ with tab2:
     Menggabungkan beberapa model dasar untuk menghasilkan keputusan klasifikasi akhir yang lebih robust dan akurat.
     """)
     st.markdown("</div>", unsafe_allow_html=True)
-`
+
