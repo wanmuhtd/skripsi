@@ -1,246 +1,121 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import joblib
-import os
-import plotly.graph_objects as go
-from tensorflow.keras.models import load_model
+import matplotlib.pyplot as plt
 
-# ======================================================
-# 1. KONFIGURASI HALAMAN
-# ======================================================
-st.set_page_config(
-    page_title="Diabetes Risk Prediction",
-    page_icon="🩺",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Konfigurasi halaman
+st.set_page_config(page_title="Diabetes Risk Prediction System", layout="wide")
 
-# ======================================================
-# 2. CUSTOM CSS (DARK MODE & SEAMLESS DESIGN)
-# ======================================================
+# Tema gelap
 st.markdown("""
 <style>
-/* Overall Page Styling */
-.stApp {
-    background-color: #181c20;
-    color: #f0f0f0;
-}
-
-/* Sidebar Styling */
-[data-testid="stSidebar"] {
-    background-color: #23272b;
-    border-right: 1px solid #30363d;
-}
-
-/* Card Styling */
-.custom-card {
-    background-color: #2b3036;
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #3c4449;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* Headings */
-h1, h2, h3 {
-    color: #ffffff !important;
-}
-
-/* Markdown Text */
-.stMarkdown {
-    color: #adbac7;
-}
-
-/* Input Field Styling */
-.stNumberInput div[data-baseweb="input"] {
-    background-color: #2f353d !important;
-    border-color: #444c56 !important;
-    color: white !important;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-/* Button Styling */
-.stButton>button {
-    width: 100%;
-    border-radius: 8px;
-    background: linear-gradient(45deg, #238636, #2ea043);
-    color: white;
-    border: none;
-    padding: 12px;
-    font-weight: bold;
-    transition: 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.stButton>button:hover {
-    background: linear-gradient(45deg, #2ea043, #3fb950);
-    border: none;
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* Tab Styling */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 10px;
-    border-bottom: 2px solid #444c56;
-}
-
-.stTabs [data-baseweb="tab"] {
-    height: 50px;
-    background-color: #2f353d;
-    border-radius: 8px 8px 0px 0px;
-    color: #adbac7;
-    border: 1px solid #3c4449;
-    padding: 10px;
-    text-align: center;
-}
-
-.stTabs [aria-selected="true"] {
-    background-color: #238636 !important;
-    color: white !important;
-}
-
-.stTabs [aria-selected="false"]:hover {
-    background-color: #444c56 !important;
-    cursor: pointer;
-}
+    .css-1d391kg {background-color: #1e1e1e;}
+    .css-1v0mbdj {color: white;}
+    .stButton>button {background-color: #4e9cff; color: white; border-radius: 30px; padding: 10px 40px;}
+    .stTextInput>div>div>input {background-color: #333; color: white; border-radius: 10px;}
+    .stNumberInput>div>div>input {background-color: #333; color: white; border-radius: 10px;}
+    .gauge-text {font-size: 40px; font-weight: bold; color: white;}
+    .confidence-text {font-size: 24px; color: #4e9cff;}
 </style>
 """, unsafe_allow_html=True)
 
-# ======================================================
-# 3. LOAD MODEL (Fungsi tetap sama)
-# ======================================================
-@st.cache_resource
-def load_resources():
-    model_path = "models"
-    scaler = joblib.load(os.path.join(model_path, "scaler.pkl"))
-    dae_model = load_model(os.path.join(model_path, "dae_model.h5"), compile=False)
-    stacking_model = joblib.load(os.path.join(model_path, "stacking_model.pkl"))
-    return scaler, dae_model, stacking_model
+# Judul utama
+st.title("Diabetes Risk Prediction System")
+st.caption("Implementasi Model Stacking Ensemble dengan Fitur Terkompensasi (DAE)")
 
-try:
-    scaler, dae_model, stacking_model = load_resources()
-except Exception as e:
-    st.error(f"Gagal memuat model: {e}")
-    st.stop()
-
-# ======================================================
-# 4. SIDEBAR
-# ======================================================
-with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/2864/2864275.png", width=80)  # Icon
-    st.markdown("### Diabetes AI System")
-    st.caption("Clinical Decision Support System")
-    st.divider()
-
-    st.markdown("""
-    **Metodologi Skripsi:**
-    - Median Imputation
-    - Denoising Autoencoder
-    - Stacking Ensemble
-    """)
-    st.divider()
-    st.caption(f"Arwan Muhtada\nTeknik Informatika")
-
-# ======================================================
-# 5. MAIN CONTENT
-# ======================================================
-st.title("🩺 Diabetes Risk Prediction System")
-st.markdown("Implementasi Model **Stacking Ensemble** dengan Fitur Terkompensasi (**DAE**).")
-
-tab1, tab2 = st.tabs(["🔍 Prediction Tool", "📚 Methodology"])
+# Tabs
+tab1, tab2 = st.tabs(["Prediction Tool", "Methodology"])
 
 with tab1:
-    # Container for Background Card Styling
-    with st.container():
-        st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-        st.subheader("Patient Clinical Parameters")
+    # Layout dua kolom utama
+    col_left, col_right = st.columns([1, 1.2])
 
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            pregnancies = st.number_input("Pregnancies", 0, 20, 1)
-            glucose = st.number_input("Glucose", 0, 300, 117)
-            blood_pressure = st.number_input("Blood Pressure", 0, 200, 72)
-        with col2:
-            skin_thickness = st.number_input("Skin Thickness", 0, 100, 29)
-            insulin = st.number_input("Insulin", 0, 900, 131)
-            bmi = st.number_input("BMI", 0.0, 70.0, 32.0)
-        with col3:
-            dpf = st.number_input("Diabetes Pedigree", 0.0, 3.0, 0.47)
-            age = st.number_input("Age", 1, 120, 25)
-        st.markdown('</div>', unsafe_allow_html=True)
+    with col_left:
+        st.markdown("### Patient Clinical Parameters")
+        
+        # Inputs dua kolom
+        row1_col1, row1_col2 = st.columns(2)
+        row2_col1, row2_col2 = st.columns(2)
+        row3_col1, row3_col2 = st.columns(2)
+        row4_col1, row4_col2 = st.columns(2)
 
-    if st.button("Analyze Diabetes Risk"):
-        with st.spinner("Calculating..."):
-            # Logic for Data Processing
-            feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction"]
-            input_data = pd.DataFrame([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, dpf]], columns=feature_names)
+        with row1_col1:
+            pregnancies = st.number_input("Pregnancies", min_value=0, value=0, step=1)
+        with row1_col2:
+            glucose = st.number_input("Glucose", min_value=0, value=0, step=1)
+        with row2_col1:
+            blood_pressure = st.number_input("Blood Pressure", min_value=0, value=0, step=1)
+        with row2_col2:
+            skin_thickness = st.number_input("Skin Thickness", min_value=0, value=0, step=1)
+        with row3_col1:
+            insulin = st.number_input("Insulin", min_value=0, value=0, step=1)
+        with row3_col2:
+            bmi = st.number_input("BMI", min_value=0.0, value=0.0, format="%.2f")
+        with row4_col1:
+            diabetes_pedigree = st.number_input("Diabetes Pedigree Function", min_value=0.0, value=0.0, format="%.3f")
+        with row4_col2:
+            age = st.number_input("Age", min_value=0, value=21, step=1)
 
-            # Median Imputation
-            medians = {"Glucose": 117.0, "BloodPressure": 72.0, "SkinThickness": 29.0, "Insulin": 131.0, "BMI": 32.05}
-            for col, val in medians.items():
-                if input_data[col][0] == 0: input_data[col] = val
+        # Tombol
+        analyze_btn = st.button("Analyze Diabetes Risk", use_container_width=True)
 
-            # Scaling & DAE
-            input_scaled = scaler.transform(input_data)
+    with col_right:
+        if analyze_btn:
+            # Dummy data untuk simulasi (ganti dengan prediksi modelmu nanti)
+            features = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", 
+                       "Insulin", "BMI", "DiabetesPedigreeFunction"]
+            input_values = [pregnancies, glucose, blood_pressure, skin_thickness, 
+                          insulin, bmi, diabetes_pedigree]
+            dae_values = [pregnancies*1.1, glucose*0.95, blood_pressure*1.05, skin_thickness*1.02,
+                         insulin*0.98, bmi*1.08, diabetes_pedigree*1.15]  # contoh kompensasi
 
-            if age > 30:
-                features_dae_scaled = dae_model.predict(input_scaled, verbose=0)
-                final_features = features_dae_scaled
+            df = pd.DataFrame({
+                "Feature": features,
+                "Input Asli": input_values,
+                "Hasil DAE": dae_values
+            })
 
-                # Plotly Comparison (Transparent)
-                features_dae_original = scaler.inverse_transform(features_dae_scaled)
-                fig = go.Figure()
-                fig.add_bar(name="Input Asli", x=feature_names, y=input_data.values[0], marker_color='#444c56')
-                fig.add_bar(name="Hasil DAE", x=feature_names, y=features_dae_original[0], marker_color='#238636')
-                fig.update_layout(
-                    barmode="group", height=300,
-                    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-                    font_color='white', margin=dict(t=20, b=20, l=0, r=0)
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                final_features = input_scaled
-                st.info("ℹ️ Kelompok usia ≤ 30: Fitur diolah tanpa kompensasi DAE.")
+            # Bar chart
+            fig, ax = plt.subplots(figsize=(10, 6))
+            x = np.arange(len(features))
+            width = 0.35
+            ax.bar(x - width/2, df["Input Asli"], width, label="Input Asli", color="#a0a0a0")
+            ax.bar(x + width/2, df["Hasil DAE"], width, label="Hasil DAE", color="#4eff8b")
+            ax.set_ylabel("Value")
+            ax.set_title("")
+            ax.set_xticks(x)
+            ax.set_xticklabels(features, rotation=45)
+            ax.legend()
+            st.pyplot(fig)
 
-            # Final Prediction
-            prediction = stacking_model.predict(final_features)[0]
-            prob = stacking_model.predict_proba(final_features)[0]
+            # Hasil prediksi (dummy)
+            result = "DIABETES NEGATIVE" if np.random.rand() > 0.4 else "DIABETES POSITIVE"
+            confidence = round(np.random.uniform(85, 98), 2)
+            risk_score = round(np.random.uniform(2.0, 8.0), 1)
 
-            # Display Results
-            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-            res_col1, res_col2 = st.columns(2)
+            st.markdown("<br><br>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='color: {'#4eff8b' if 'NEGATIVE' in result else '#ff4e4e'}; text-align: center;'>{result}</h1>", unsafe_allow_html=True)
+            st.markdown(f"<p class='confidence-text' style='text-align: center;'>Confidence Score</p>", unsafe_allow_html=True)
+            st.markdown(f"<p class='gauge-text' style='text-align: center;'>{confidence}%</p>", unsafe_allow_html=True)
+            
+            # Gauge sederhana dengan progress bar horizontal + custom HTML
+            st.markdown(f"""
+            <div style="text-align: center;">
+                <div style="font-size: 50px; font-weight: bold; color: white;">{risk_score}</div>
+                <div style="width: 80%; margin: 0 auto; background: linear-gradient(to right, #4eff8b 0%, #ff4e4e 100%); border-radius: 50px; height: 30px; position: relative;">
+                    <div style="position: absolute; left: {min(max((risk_score / 10) * 100, 0), 100)}%; top: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: white; border-radius: 50%; border: 8px solid #333;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto;">
+                    <span style="color: #4eff8b;">0</span>
+                    <span style="color: white;">5</span>
+                    <span style="color: #ff4e4e;">10</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-            with res_col1:
-                status = "DIABETES POSITIVE" if prediction == 1 else "DIABETES NEGATIVE"
-                color = "#f85149" if prediction == 1 else "#3fb950"
-                st.markdown(f"<h2 style='color:{color};'>{status}</h2>", unsafe_allow_html=True)
-                st.metric("Confidence Score", f"{max(prob)*100:.2f}%")
-
-            with res_col2:
-                fig_gauge = go.Figure(go.Indicator(
-                    mode="gauge+number",
-                    value=prob[1] * 100,
-                    gauge={
-                        "axis": {"range": [0, 100], "tickcolor": "white"},
-                        "bar": {"color": "#f85149" if prob[1] > 0.5 else "#3fb950"},
-                        "bgcolor": "#22272e",
-                        "steps": [{"range": [0, 50], "color": "#238636"}, {"range": [50, 100], "color": "#8b100e"}]
-                    }
-                ))
-                fig_gauge.update_layout(height=250, paper_bgcolor='rgba(0,0,0,0)', font_color='white', margin=dict(t=50, b=0))
-                st.plotly_chart(fig_gauge, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.markdown("#### (Grafik dan hasil akan muncul setelah analisis)")
 
 with tab2:
-    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-    st.write("### Penjelasan Metodologi")
-    st.markdown("""
-    1. **Denoising Autoencoder (DAE):** Berfungsi sebagai *feature compensation* untuk memperbaiki kualitas data pasien usia dewasa ( > 30 tahun).
-    2. **Stacking Ensemble:** Menggunakan kombinasi model (misal: RF, SVM, XGB) sebagai *base learners* dan Meta-classifier untuk hasil akhir yang lebih akurat.
-    3. **Median Imputation:** Menangani data hilang/nol pada parameter klinis yang krusial.
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("### Methodology")
+    st.write("Di sini kamu bisa menjelaskan detail model Stacking Ensemble dengan DAE, arsitektur, dataset, performa, dll. Tambahkan gambar, rumus LaTeX, atau tabel sesuai kebutuhan.")
