@@ -206,7 +206,7 @@ with tab1:
                                'steps': [{'range': [0, 50], 'color': "#21262d"}, {'range': [50, 100], 'color': "#21262d"}]},
                         title={'text': "Risk Prob %", 'font': {'size': 12}}
                     ))
-                    fig_g.update_layout(height=100, margin=dict(t=0, b=0), paper_bgcolor='rgba(0,0,0,0)', font_color='white')
+                    fig_g.update_layout(height=100, margin=dict(t=20, b=0), paper_bgcolor='rgba(0,0,0,0)', font_color='white')
                     st.plotly_chart(fig_g, use_container_width=True)
         else:
             # Tampilan awal agar tetap simetris
@@ -227,6 +227,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
