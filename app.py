@@ -176,22 +176,6 @@ with tab1:
                 final_feats = scaled_data
                 show_dae = False
 
-            # --- VISUALIZATION ---
-            st.markdown('<div class="css-card">', unsafe_allow_html=True)
-            
-            # Bar Chart Comparison
-            fig = go.Figure()
-            fig.add_bar(name="Input", x=feats, y=data.values[0], marker_color='#30363d')
-            if show_dae:
-                fig.add_bar(name="DAE Corrected", x=feats, y=recon_data[0], marker_color='#238636')
-            
-            fig.update_layout(
-                height=250, barmode='group', margin=dict(t=0, b=0, l=0, r=0),
-                paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#8b949e', legend=dict(orientation="h", y=1.2)
-            )
-            st.plotly_chart(fig, use_container_width=True)
-
             # Prediction
             prob = stacking_model.predict_proba(final_feats)[0]
             pred = stacking_model.predict(final_feats)[0]
@@ -233,3 +217,4 @@ with tab2:
     3. **Ensemble Learning**: Model *Stacking* menggabungkan kekuatan Random Forest, XGBoost, dan Logistic Regression.
     """)
     st.markdown('</div>', unsafe_allow_html=True)
+
