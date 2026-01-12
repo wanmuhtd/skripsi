@@ -118,11 +118,11 @@ except Exception as e:
 # 4. SIDEBAR
 # ======================================================
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/2864/2864275.png", width=80) # Opsional: Icon
+    st.image("https://cdn-icons-png.flaticon.com/512/2864/2864275.png", width=80)  # Opsional: Icon
     st.markdown("### Diabetes AI System")
     st.caption("Clinical Decision Support System")
     st.divider()
-    
+
     st.markdown("""
     **Metodologi Skripsi:**
     - Median Imputation
@@ -145,7 +145,8 @@ with tab1:
     with st.container():
         st.markdown('<div class="custom-card">', unsafe_allow_html=True)
         st.subheader("Patient Clinical Parameters")
-        
+
+        # Layout input dalam kolom agar rapi
         col1, col2, col3 = st.columns(3)
         with col1:
             pregnancies = st.number_input("Pregnancies", 0, 20, 1)
@@ -173,18 +174,18 @@ with tab1:
 
             # Scaling & DAE
             input_scaled = scaler.transform(input_data)
-            
+
             if age > 30:
                 features_dae_scaled = dae_model.predict(input_scaled, verbose=0)
                 final_features = features_dae_scaled
-                
+
                 # Plotly Comparison (Transparan)
                 features_dae_original = scaler.inverse_transform(features_dae_scaled)
                 fig = go.Figure()
                 fig.add_bar(name="Input Asli", x=feature_names, y=input_data.values[0], marker_color='#444c56')
                 fig.add_bar(name="Hasil DAE", x=feature_names, y=features_dae_original[0], marker_color='#238636')
                 fig.update_layout(
-                    barmode="group", height=300, 
+                    barmode="group", height=300,
                     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
                     font_color='white', margin=dict(t=20, b=20, l=0, r=0)
                 )
@@ -200,13 +201,13 @@ with tab1:
             # Hasil dalam Card
             st.markdown('<div class="custom-card">', unsafe_allow_html=True)
             res_col1, res_col2 = st.columns(2)
-            
+
             with res_col1:
                 status = "DIABETES POSITIVE" if prediction == 1 else "DIABETES NEGATIVE"
                 color = "#f85149" if prediction == 1 else "#3fb950"
                 st.markdown(f"<h2 style='color:{color};'>{status}</h2>", unsafe_allow_html=True)
                 st.metric("Confidence Score", f"{max(prob)*100:.2f}%")
-            
+
             with res_col2:
                 fig_gauge = go.Figure(go.Indicator(
                     mode="gauge+number",
