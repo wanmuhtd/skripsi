@@ -213,7 +213,7 @@ with tab1:
             with st.container(border=True):
                 st.markdown('<p class="section-header">Feature Analysis</p>', unsafe_allow_html=True)
                 st.markdown(
-                    "<div style='flex-grow: 1; display: flex; align-items: center; justify-content: center; color: #484f58; text-align: center; border: 1px dashed #30363d; border-radius: 10px;'>"
+                    "<div style='height: 750px; display: flex; align-items: center; justify-content: center; color: #484f58; text-align: center; border: 1px dashed #30363d; border-radius: 10px;'>"
                     "Hasil analisis akan muncul di sini setelah Anda memasukkan data pasien dan menekan tombol 'Analyze'."
                     "</div>", 
                     unsafe_allow_html=True
