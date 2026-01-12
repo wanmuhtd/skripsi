@@ -1,3 +1,4 @@
+# !pip install streamlit pandas numpy scikit-learn plotly tensorflow joblib
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -16,37 +17,33 @@ st.set_page_config(
 )
 
 # ======================================================
-# 2. CUSTOM CSS (FIX UNTUK KERAPIAN & TINGGI SEJAJAR)
+# 2. CUSTOM CSS (FIX TINGGI SIMETRIS)
 # ======================================================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .stApp {
         background-color: #0d1117;
     }
 
-    /* Target utama container agar card memiliki tinggi yang sama */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: #161b22 !important;
-        border: 1px solid #30363d !important;
-        border-radius: 12px !important;
-        padding: 25px !important;
-        min-height: 580px !important; /* Tinggi dikunci agar simetris */
+    /* Memaksa kontainer di dalam kolom untuk mengisi tinggi 100% */
+    [data-testid="column"] > div > [data-testid="stVerticalBlockBorderWrapper"] {
+        height: 100% !important;
         display: flex;
         flex-direction: column;
+        justify-content: flex-start;
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
     }
 
-    /* Mengatur jarak antar baris input agar lebih rapi */
-    .stNumberInput {
-        margin-bottom: -10px !important;
-    }
-
-    /* Judul Seksi */
+    /* Menjaga agar konten di dalam card tetap rapi */
     .section-header {
         color: #8b949e;
         font-size: 0.8rem;
@@ -56,54 +53,32 @@ st.markdown("""
         text-transform: uppercase;
     }
 
-    /* Tab Centering */
-    .stTabs [data-baseweb="tab-list"] {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 30px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background: #21262d;
-        border-radius: 20px;
-        padding: 8px 30px;
-        color: #8b949e;
-        border: 1px solid #30363d;
-    }
-    .stTabs [aria-selected="true"] {
-        background: #58a6ff !important;
-        color: white !important;
-    }
-
-    /* Button Styling */
+    /* Menyelaraskan tombol di bagian bawah jika diperlukan */
     .stButton>button {
         width: 100%;
         background: #238636;
         color: white;
-        border-radius: 8px;
-        padding: 15px;
+        border-radius: 12px;
+        padding: 12px;
         font-weight: 700;
         border: none;
-        margin-top: 25px;
-    }
-    .stButton>button:hover {
-        background: #2ea043;
+        margin-top: auto; /* Mendorong tombol ke bawah */
     }
 
-    /* Metrics Styling */
-    [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
+    .stTabs [data-baseweb="tab-list"] {
+        justify-content: center;
+        gap: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ======================================================
-# 3. LOAD RESOURCES (DAE & STACKING)
+# 3. LOAD RESOURCES (Sesuai Konteks Skripsi)
 # ======================================================
 @st.cache_resource
 def load_resources():
     path = "models"
+    # Pastikan file-file ini tersedia di direktori 'models'
     scaler = joblib.load(os.path.join(path, "scaler.pkl"))
     dae_model = load_model(os.path.join(path, "dae_model.h5"), compile=False)
     stacking_model = joblib.load(os.path.join(path, "stacking_model.pkl"))
@@ -119,18 +94,19 @@ except Exception as e:
 # 4. MAIN LAYOUT
 # ======================================================
 st.markdown("<h1 style='text-align: center; color: white;'>Diabetes Intelligence System</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8b949e; margin-bottom: 30px;'>Kompensasi Fitur Denoising Autoencoder & Klasifikasi Stacking Ensemble</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8b949e; margin-bottom: 30px;'>Kompensasi Fitur DAE & Stacking Ensemble</p>", unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["🔍 Prediction Tool", "📖 Methodology"])
+tab1, tab2 = st.tabs(["🔍 Analysis Tool", "📖 Methodology"])
 
 with tab1:
+    # Menggunakan kolom dengan proporsi yang seimbang
     col_left, col_right = st.columns([1, 1.2], gap="medium")
 
     with col_left:
         with st.container(border=True):
             st.markdown('<p class="section-header">Patient Clinical Parameters</p>', unsafe_allow_html=True)
             
-            # Input Grid
+            # Grid Input 2 Kolom
             c1, c2 = st.columns(2)
             with c1:
                 preg = st.number_input("Pregnancies", 0, 20, 1)
@@ -143,43 +119,36 @@ with tab1:
                 dpf = st.number_input("Pedigree Func", 0.0, 3.0, 0.47)
                 age = st.number_input("Patient Age", 1, 120, 25)
             
-            # Button diletakkan di bawah input
-            st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
+            # Spacer untuk mendorong tombol ke bawah agar sejajar secara visual
+            st.markdown("<div style='flex-grow: 1; min-height: 20px;'></div>", unsafe_allow_html=True)
             predict_btn = st.button("Analyze Diabetes Risk")
 
     with col_right:
         if predict_btn:
             # --- LOGIC PROCESSING ---
-            feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DPF"]
+            feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction"]
             df_raw = pd.DataFrame([[preg, glu, bp, stk, ins, bmi, dpf]], columns=feature_names)
             
-            # Median Imputation (Simulation based on your context)
+            # Imputasi Median
             medians = {"Glucose": 117.0, "BloodPressure": 72.0, "SkinThickness": 29.0, "Insulin": 131.0, "BMI": 32.05}
             for col, val in medians.items():
                 if df_raw[col][0] == 0: df_raw[col] = val
 
-            # Scaling (Gunakan .values untuk menghindari feature name error)
+            # Scaling & DAE Logic
             scaled_input = scaler.transform(df_raw.values)
-            
-            # DAE Logic
-            if age > 30:
-                final_features = dae_model.predict(scaled_input, verbose=0)
-                is_compensated = True
-            else:
-                final_features = scaled_input
-                is_compensated = False
+            final_features = dae_model.predict(scaled_input, verbose=0) if age > 30 else scaled_input
 
-            # --- VISUALIZATION ---
             with st.container(border=True):
                 st.markdown('<p class="section-header">Feature Analysis (Scaled 0-1)</p>', unsafe_allow_html=True)
                 
+                # Grafik Perbandingan
                 fig = go.Figure()
                 fig.add_bar(name="Input", x=feature_names, y=scaled_input[0], marker_color='#30363d')
-                if is_compensated:
+                if age > 30:
                     fig.add_bar(name="DAE Comp.", x=feature_names, y=final_features[0], marker_color='#58a6ff')
                 
                 fig.update_layout(
-                    height=250, barmode='group', margin=dict(t=0, b=0, l=0, r=0),
+                    height=240, barmode='group', margin=dict(t=0, b=0, l=0, r=0),
                     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
                     font_color='#8b949e', legend=dict(orientation="h", y=1.2, xanchor="right", x=1)
                 )
@@ -191,41 +160,35 @@ with tab1:
                 prob = stacking_model.predict_proba(final_features)[0]
                 pred = stacking_model.predict(final_features)[0]
                 
-                res_col1, res_col2 = st.columns(2)
-                with res_col1:
-                    label = "POSITIVE" if pred == 1 else "NEGATIVE"
+                res1, res2 = st.columns(2)
+                with res1:
+                    status = "POSITIVE" if pred == 1 else "NEGATIVE"
                     color = "#ff7b72" if pred == 1 else "#3fb950"
-                    st.markdown(f"<p style='color:#8b949e; font-size:0.8rem; margin-bottom:0;'>Result</p>", unsafe_allow_html=True)
-                    st.markdown(f"<p style='color:{color}; font-size:2rem; font-weight:800; margin-top:-5px;'>{label}</p>", unsafe_allow_html=True)
+                    st.markdown(f"### <span style='color:{color};'>{status}</span>", unsafe_allow_html=True)
                     st.metric("Confidence", f"{max(prob)*100:.2f}%")
 
-                with res_col2:
+                with res2:
                     fig_g = go.Figure(go.Indicator(
                         mode="gauge+number", value=prob[1] * 100,
                         gauge={'axis': {'range': [0, 100]}, 'bar': {'color': color},
                                'steps': [{'range': [0, 50], 'color': "#21262d"}, {'range': [50, 100], 'color': "#21262d"}]},
                         title={'text': "Risk Prob %", 'font': {'size': 12}}
                     ))
-                    fig_g.update_layout(height=180, margin=dict(t=0, b=0), paper_bgcolor='rgba(0,0,0,0)', font_color='white')
+                    fig_g.update_layout(height=160, margin=dict(t=0, b=0), paper_bgcolor='rgba(0,0,0,0)', font_color='white')
                     st.plotly_chart(fig_g, use_container_width=True)
         else:
-            # Tampilan awal agar tetap simetris
             with st.container(border=True):
-                st.markdown('<p class="section-header">Feature Analysis</p>', unsafe_allow_html=True)
                 st.markdown(
-                    "<div style='height: 400px; display: flex; align-items: center; justify-content: center; color: #484f58; text-align: center; border: 1px dashed #30363d; border-radius: 10px;'>"
-                    "Hasil analisis akan muncul di sini setelah Anda memasukkan data pasien dan menekan tombol 'Analyze'."
+                    "<div style='height: 480px; display: flex; align-items: center; justify-content: center; color: #484f58; text-align: center;'>"
+                    "Hasil analisis akan muncul di sini secara otomatis."
                     "</div>", 
                     unsafe_allow_html=True
                 )
 
 with tab2:
     with st.container(border=True):
-        st.markdown("### Landasan Teori & Metodologi [cite: 2025-12-18]")
-        st.write("""
-        1. **Imputasi Median**: Mengatasi data kosong pada fitur Glucose, Blood Pressure, dsb.
-        2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
-        3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
-        """)
-
-#
+        st.markdown("### Metodologi Penelitian")
+        st.write("Aplikasi ini menggunakan alur kerja:")
+        st.write("- **Imputasi Median**: Mengatasi data nol.")
+        st.write("- **Min-Max Scaling**: Normalisasi fitur ke rentang $$[0, 1]$$.")
+        st.write("- **DAE**: Perbaikan fitur untuk usia > 30 tahun.")
