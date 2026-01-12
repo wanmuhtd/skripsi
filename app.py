@@ -24,30 +24,26 @@ st.markdown("""
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     .stApp { background: #0d1117; color: #e6edf3; }
     
-    /* Card Container */
     .css-card {
         background: #161b22;
         border: 1px solid #30363d;
         border-radius: 12px;
-        padding: 20px;
+        padding: 24px;
         margin-bottom: 20px;
     }
 
-    /* Tabs Styling */
     .stTabs [data-baseweb="tab-list"] { display: flex; justify-content: center; gap: 10px; }
     .stTabs [data-baseweb="tab"] {
         background: #21262d; border-radius: 20px; padding: 5px 30px; color: #8b949e; border: 1px solid #30363d;
     }
     .stTabs [aria-selected="true"] { background: #f0f6fc !important; color: #0d1117 !important; font-weight: bold; }
 
-    /* Button Styling */
     .stButton>button {
         width: 100%; background: #238636; color: white; border-radius: 8px; border: none;
-        padding: 12px; font-weight: bold; transition: 0.3s;
+        padding: 14px; font-weight: bold; transition: 0.3s; margin-top: 10px;
     }
     .stButton>button:hover { background: #2ea043; transform: translateY(-2px); }
 
-    /* Input Field */
     div[data-baseweb="input"] { background: #0d1117 !important; border: 1px solid #30363d !important; color: white !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -73,7 +69,7 @@ except Exception as e:
 # 4. HEADER
 # ======================================================
 st.markdown("<h1 style='text-align: center; color: white;'>Diabetes Risk Prediction</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8b949e;'>Clinical Decision Support System with DAE Compensation & Stacking Ensemble</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8b949e; margin-bottom: 40px;'>CDSS dengan Kompensasi DAE & Stacking Ensemble</p>", unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs(["🔍 Analysis Tool", "📚 Methodology"])
 
@@ -82,7 +78,7 @@ with tab1:
 
     with col_input:
         st.markdown('<div class="css-card">', unsafe_allow_html=True)
-        st.subheader("Patient Clinical Data")
+        st.subheader("Clinical Parameters")
         
         c1, c2 = st.columns(2)
         with c1:
@@ -101,27 +97,22 @@ with tab1:
 
     with col_viz:
         if predict_btn:
-             # --- LOGIC PROCESSING ---
-            # Pastikan urutan kolom ini SAMA PERSIS dengan saat Anda melakukan training model
+            # --- LOGIC PROCESSING ---
+            # Urutan sesuai data latih
             feature_names = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction"]
             raw_data = [preg, glu, bp, stk, ins, bmi, dpf]
-            
-            # Buat DataFrame
             df_raw = pd.DataFrame([raw_data], columns=feature_names)
             
-            # 1. Median Imputation (Gunakan nilai dari hasil observasi data training)
+            # 1. Median Imputation
             medians = {"Glucose": 117.0, "BloodPressure": 72.0, "SkinThickness": 29.0, "Insulin": 131.0, "BMI": 32.05}
             for col, val in medians.items():
-                if df_raw[col][0] == 0: 
-                    df_raw[col] = val
-            
-            # 2. SCALING (SOLUSI: Gunakan .values agar tidak error nama kolom)
-            # Ini akan mengubah DataFrame menjadi array [1, 7] tanpa membawa nama kolom
-            scaled_input = scaler.transform(df_raw.values) 
+                if df_raw[col][0] == 0: df_raw[col] = val
+
+            # 2. SCALING (Menggunakan .values untuk menghindari error nama kolom)
+            scaled_input = scaler.transform(df_raw.values)
             
             # 3. DAE Processing
             if age > 30:
-                # Lakukan hal yang sama jika model DAE Anda juga sensitif terhadap nama kolom
                 scaled_dae = dae_model.predict(scaled_input, verbose=0)
                 final_features = scaled_dae
                 is_compensated = True
@@ -129,67 +120,56 @@ with tab1:
                 final_features = scaled_input
                 is_compensated = False
 
-            # --- VISUALIZATION: SCALED FEATURES HISTOGRAM ---
+            # --- VISUALIZATION: SCALED HISTOGRAM ---
             st.markdown('<div class="css-card">', unsafe_allow_html=True)
-            st.caption("📊 Feature Value Comparison (Scaled 0-1)")
+            st.caption("📊 Feature Distribution (Scaled 0-1)")
             
             fig = go.Figure()
+            # Bar Chart Histogram
             fig.add_bar(name="Scaled Input", x=feature_names, y=scaled_input[0], marker_color='#444c56')
-            
             if is_compensated:
                 fig.add_bar(name="DAE Compensated", x=feature_names, y=scaled_dae[0], marker_color='#58a6ff')
             
             fig.update_layout(
-                height=250, barmode='group', margin=dict(t=10, b=10, l=0, r=0),
+                height=300, barmode='group', margin=dict(t=10, b=10, l=0, r=0),
                 paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#8b949e', legend=dict(orientation="h", y=1.2)
+                font_color='#8b949e', legend=dict(orientation="h", y=1.2, xanchor="right", x=1)
             )
             st.plotly_chart(fig, use_container_width=True)
-            
-            # --- COMPARISON TABLE (RAW VS SCALED) ---
-            st.caption("📋 Detailed Feature Values")
-            comparison_df = pd.DataFrame({
-                "Feature": feature_names,
-                "Raw Value": raw_data,
-                "Scaled (Model View)": np.round(final_features[0], 4)
-            })
-            st.dataframe(comparison_df, use_container_width=True, hide_index=True)
-            st.markdown('</div>', unsafe_allow_html=True)
 
             # --- PREDICTION RESULT ---
-            st.markdown('<div class="css-card">', unsafe_allow_html=True)
+            st.divider()
             prob = stacking_model.predict_proba(final_features)[0]
             pred = stacking_model.predict(final_features)[0]
             
-            r1, r2 = st.columns(2)
-            with r1:
+            res_col1, res_col2 = st.columns(2)
+            with res_col1:
                 status = "POSITIVE" if pred == 1 else "NEGATIVE"
                 color = "#ff7b72" if pred == 1 else "#3fb950"
-                st.markdown(f"### Result:<br><span style='color:{color}; font-size:38px; font-weight:800;'>{status}</span>", unsafe_allow_html=True)
-                st.metric("Confidence Score", f"{max(prob)*100:.2f}%")
+                st.markdown(f"### Result:<br><span style='color:{color}; font-size:36px; font-weight:800;'>{status}</span>", unsafe_allow_html=True)
+                st.metric("Confidence", f"{max(prob)*100:.2f}%")
             
-            with r2:
+            with res_col2:
                 fig_g = go.Figure(go.Indicator(
                     mode="gauge+number",
                     value=prob[1] * 100,
                     gauge={'axis': {'range': [0, 100]}, 'bar': {'color': color},
                            'steps': [{'range': [0, 50], 'color': "#21262d"}, {'range': [50, 100], 'color': "#21262d"}]},
-                    title={'text': "Risk Probability %", 'font': {'size': 14}}
+                    title={'text': "Risk Prob %", 'font': {'size': 14}}
                 ))
                 fig_g.update_layout(height=200, margin=dict(t=30, b=0), paper_bgcolor='rgba(0,0,0,0)', font_color='white')
                 st.plotly_chart(fig_g, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.info("👈 Masukkan data pasien dan klik 'Analyze Diabetes Risk' untuk melihat hasil.")
+            st.info("👈 Masukkan data klinis pasien dan klik tombol analisis.")
 
 with tab2:
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     st.markdown("""
-    ### Metodologi Penelitian
-    1. **Data Preprocessing**: Pengisian nilai hilang (*missing values*) menggunakan median dari dataset latih.
-    2. **Feature Normalization**: Semua fitur klinis ditransformasikan menggunakan `MinMaxScaler` ke rentang [0, 1] agar model neural network bekerja optimal.
-    3. **Feature Compensation (DAE)**: Menggunakan *Denoising Autoencoder* untuk memperbaiki kualitas fitur pada kelompok usia dewasa (> 30 tahun).
-    4. **Stacking Ensemble**: Prediksi akhir dihasilkan oleh model ensemble yang menggabungkan beberapa algoritma klasifikasi.
+    ### Alur Pemrosesan Data
+    1. **Imputasi**: Menangani nilai nol pada fitur medis penting dengan nilai median dataset.
+    2. **Normalisasi**: Transformasi fitur ke skala **[0, 1]** menggunakan *Min-Max Scaler* agar distribusi data seragam.
+    3. **Kompensasi Fitur (DAE)**: Khusus kelompok usia > 30 tahun, fitur yang telah di-scaling diproses melalui *Denoising Autoencoder* untuk memperbaiki variansi data sebelum klasifikasi.
+    4. **Klasifikasi**: Model *Stacking Ensemble* memberikan prediksi akhir berdasarkan fitur terkompensasi.
     """)
     st.markdown('</div>', unsafe_allow_html=True)
-
