@@ -75,6 +75,10 @@ st.markdown("""
         color: white !important;
     }
 
+    div[data-testid="stButton"] {
+        width: 100%;
+    }
+
     /* Button Styling */
     .stButton>button {
         width: 100%;
@@ -144,7 +148,7 @@ with tab1:
                 age = st.number_input("Patient Age", 1, 120, 25)
             
             # Button diletakkan di bawah input
-            st.markdown("<div style='flex-grow: 1; allignment: center;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
             predict_btn = st.button("Analyze Diabetes Risk")
 
     with col_right:
@@ -227,6 +231,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
