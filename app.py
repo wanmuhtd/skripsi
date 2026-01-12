@@ -179,7 +179,7 @@ with tab1:
                     fig.add_bar(name="DAE Comp.", x=feature_names, y=final_features[0], marker_color='#58a6ff')
                 
                 fig.update_layout(
-                    height=200, barmode='group', margin=dict(t=-20, b=0, l=0, r=0),
+                    height=200, barmode='group', margin=dict(t=20, b=0, l=0, r=0),
                     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
                     font_color='#8b949e', legend=dict(orientation="h", y=1.2, xanchor="right", x=1)
                 )
@@ -227,6 +227,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
