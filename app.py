@@ -178,10 +178,31 @@ with tab1:
                 if is_compensated:
                     fig.add_bar(name="DAE Comp.", x=feature_names, y=final_features[0], marker_color='#58a6ff')
                 
+                # Merapikan layout Plotly agar tampilan visual lebih bersih dan konsisten
                 fig.update_layout(
-                    height=200, barmode='group', margin=dict(t=0, b=0, l=0, r=0),
-                    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-                    font_color='#8b949e', legend=dict(orientation="h", y=1.2, xanchor="right", x=1)
+                    height=200,                      # Menentukan tinggi tetap agar konsisten di dalam card UI
+                    barmode='group',                 # Mengelompokkan bar jika terdapat beberapa kategori data
+                    # Memberikan sedikit margin atas (t=30) agar legend tidak menempel atau terpotong
+                    margin=dict(t=30, b=10, l=10, r=10), 
+                    paper_bgcolor='rgba(0,0,0,0)',   # Transparansi canvas luar
+                    plot_bgcolor='rgba(0,0,0,0)',    # Transparansi area grafik (plot)
+                    font_color='#8b949e',            # Warna font (disesuaikan dengan skema warna UI modern)
+                    
+                    # Konfigurasi Legend (Keterangan)
+                    legend=dict(
+                        orientation="h",             # Format horizontal agar hemat ruang vertikal
+                        yanchor="bottom",            # Menentukan titik jangkar vertikal
+                        y=1.02,                      # Posisi legend tepat di atas area plot
+                        xanchor="right",             # Menentukan titik jangkar horizontal
+                        x=1                          # Meratakan legend ke sisi kanan
+                    ),
+                    
+                    # Optimasi sumbu (opsional untuk mempercantik tampilan)
+                    xaxis=dict(showgrid=False),      # Menghilangkan garis grid pada sumbu X
+                    yaxis=dict(
+                        showgrid=True, 
+                        gridcolor='#30363d'          # Memberikan warna grid yang samar (cocok untuk tema gelap)
+                    )
                 )
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -229,6 +250,7 @@ with tab2:
         """)
 
 #
+
 
 
 
