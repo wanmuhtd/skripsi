@@ -241,6 +241,7 @@ with tab1:
 
 with tab2:
 with st.container(border=True):
+
     # Judul section TANPA heading markdown
     st.markdown(
         """
@@ -269,7 +270,12 @@ with st.container(border=True):
         ---
         **Author**  
         Arwan Muhtada  
-        Program Studi Teknik
+        Program Studi Teknik Informatika  
+        Fakultas Matematika dan Ilmu Pengetahuan Alam  
+        Universitas Negeri Semarang
+        """
+    )
+
 
 
 
