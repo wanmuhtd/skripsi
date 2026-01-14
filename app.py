@@ -213,7 +213,7 @@ with tab1:
         else:
             # Tampilan awal agar tetap simetris
             with st.container(border=True):
-                st.markdown('<p class="section-header">Feature Analysis</p>', unsafe_allow_html=True)
+                st.markdown('<p class="section-header" style=display: flex; align-items: center; justify-content: center; text-align: center>Feature Analysis</p>', unsafe_allow_html=True)
                 st.markdown(
                     """
                     <div style='height: 475px; display: flex; align-items: center; justify-content: center; color: #484f58; text-align: center; border: 1px dashed #30363d; border-radius: 10px; margin-bottom: 20px;'>
@@ -232,6 +232,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
