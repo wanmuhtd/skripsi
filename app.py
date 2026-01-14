@@ -125,15 +125,17 @@ st.markdown(
     <div style="
         text-align: center;
         color: white;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin-bottom: 1.2rem;
     ">
         Prediksi Risiko Diabetes
     </div>
     """,
     unsafe_allow_html=True
 )
+
 st.markdown("<p style='text-align: center; color: #8b949e; margin-bottom: 30px;'>Kompensasi Fitur Denoising Autoencoder & Klasifikasi Stacking Ensemble</p>", unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs(["🔍 Prediction Tool", "📖 Methodology"])
@@ -245,6 +247,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
