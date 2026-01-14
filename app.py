@@ -240,41 +240,41 @@ with tab1:
                 )
 
 with tab2:
-with st.container(border=True):
+    with st.container(border=True):
+        # Judul section TANPA heading markdown
+        st.markdown(
+            """
+            <div style="
+                font-size: 1.3rem;
+                font-weight: 600;
+                margin-bottom: 0.6rem;
+            ">
+                Informasi Sistem
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    
+        st.markdown(
+            """
+            Sistem ini merupakan **prototype sistem pendukung keputusan**
+            yang mengklasifikasikan risiko **Diabetes Mellitus**
+            menggunakan pendekatan *stacking ensemble* berbasis fitur terkompensasi.
+    
+            - **Imputasi Median & Min–Max Scaling** untuk pra-pemrosesan data klinis  
+            - **Denoising Autoencoder (DAE)** untuk kompensasi fitur antar kelompok usia  
+            - **Stacking Ensemble** (Random Forest, XGBoost, KNN + Logistic Regression)
+              untuk meningkatkan akurasi dan stabilitas prediksi  
+    
+            ---
+            **Author**  
+            Arwan Muhtada  
+            Program Studi Teknik Informatika  
+            Fakultas Matematika dan Ilmu Pengetahuan Alam  
+            Universitas Negeri Semarang
+            """
+        )
 
-    # Judul section TANPA heading markdown
-    st.markdown(
-        """
-        <div style="
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-        ">
-            Informasi Sistem
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        """
-        Sistem ini merupakan **prototype sistem pendukung keputusan**
-        yang mengklasifikasikan risiko **Diabetes Mellitus**
-        menggunakan pendekatan *stacking ensemble* berbasis fitur terkompensasi.
-
-        - **Imputasi Median & Min–Max Scaling** untuk pra-pemrosesan data klinis  
-        - **Denoising Autoencoder (DAE)** untuk kompensasi fitur antar kelompok usia  
-        - **Stacking Ensemble** (Random Forest, XGBoost, KNN + Logistic Regression)
-          untuk meningkatkan akurasi dan stabilitas prediksi  
-
-        ---
-        **Author**  
-        Arwan Muhtada  
-        Program Studi Teknik Informatika  
-        Fakultas Matematika dan Ilmu Pengetahuan Alam  
-        Universitas Negeri Semarang
-        """
-    )
 
 
 
