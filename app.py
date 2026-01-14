@@ -260,11 +260,11 @@ with tab2:
             Sistem ini merupakan **prototype sistem pendukung keputusan**
             yang mengklasifikasikan risiko **Diabetes Mellitus**
             menggunakan pendekatan *stacking ensemble* berbasis fitur terkompensasi.
-    
-            - **Imputasi Median & Min–Max Scaling** untuk pra-pemrosesan data klinis  
-            - **Denoising Autoencoder (DAE)** untuk kompensasi fitur antar kelompok usia  
-            - **Stacking Ensemble** (Random Forest, XGBoost, KNN + Logistic Regression)
-              untuk meningkatkan akurasi dan stabilitas prediksi  
+
+            Data dalam sistem ini data akan melalui beberapa proses seperti:
+            1. **Imputasi Median & Min–Max Scaling** untuk pra-pemrosesan data klinis  
+            2. **Denoising Autoencoder (DAE)** untuk kompensasi kelompok usia tua
+            3. **Stacking Ensemble** (Random Forest, XGBoost, KNN + Logistic Regression) untuk klasifikasi akhir
     
             ---
             **Author**  
@@ -274,6 +274,7 @@ with tab2:
             Universitas Negeri Semarang
             """
         )
+
 
 
 
