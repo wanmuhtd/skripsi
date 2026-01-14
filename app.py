@@ -127,8 +127,8 @@ st.markdown(
         color: white;
         font-size: 3rem;
         font-weight: 800;
-        letter-spacing: 0.5px;
-        margin-bottom: 1rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 15px;
     ">
         Prediksi Risiko Diabetes
     </div>
@@ -247,6 +247,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
