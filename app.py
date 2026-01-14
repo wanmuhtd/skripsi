@@ -216,21 +216,7 @@ with tab1:
                 st.markdown('<p class="section-header">Feature Analysis</p>', unsafe_allow_html=True)
                 st.markdown(
                     """
-                    <div style="
-                        min-height: 500px;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        color: #484f58;
-                        text-align: center;
-                        border: 1px dashed #30363d;
-                        border-radius: 10px;
-                        padding: 20px;
-                    ">
-                        Hasil analisis akan muncul di sini setelah Anda memasukkan data pasien dan
-                        menekan tombol <b>'Analyze'</b>.
-                    </div>
+                    "<div style='height: 400px; display: flex; align-items: center; justify-content: center; color: #484f58; text-align: center; border: 1px dashed #30363d; border-radius: 10px;'>" "Hasil analisis akan muncul di sini setelah Anda memasukkan data pasien dan menekan tombol 'Analyze'." "</div>"
                     """,
                     unsafe_allow_html=True
                 )
@@ -243,6 +229,7 @@ with tab2:
         2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
         3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
         """)
+
 
 
 
