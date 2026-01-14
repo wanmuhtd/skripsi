@@ -138,7 +138,7 @@ st.markdown(
 
 st.markdown("<p style='text-align: center; color: #8b949e; margin-bottom: 30px;'>Prediksi Risiko Penyakit Diabetes Mellitus dengan Stacking Ensemble dan Fitur Terkompensasi (DAE)</p>", unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["🔍 Prediction Tool", "📖 Methodology"])
+tab1, tab2 = st.tabs(["🔍 Prediction Tool", "📖 Information"])
 
 with tab1:
     col_left, col_right = st.columns([1, 1.2], gap="medium")
@@ -240,13 +240,39 @@ with tab1:
                 )
 
 with tab2:
-    with st.container(border=True):
-        st.markdown("### Landasan Teori & Metodologi [cite: 2025-12-18]")
-        st.write("""
-        1. **Imputasi Median**: Mengatasi data kosong pada fitur Glucose, Blood Pressure, dsb.
-        2. **Denoising Autoencoder (DAE)**: Digunakan untuk mengkompensasi fitur (menghilangkan noise) khusus pada pasien dewasa (> 30 tahun).
-        3. **Stacking Ensemble**: Menggabungkan beberapa model klasifikasi dasar untuk meningkatkan akurasi akhir prediksi risiko diabetes.
-        """)
+with st.container(border=True):
+    # Judul section TANPA heading markdown
+    st.markdown(
+        """
+        <div style="
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+        ">
+            Informasi Sistem
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+        Sistem ini merupakan **prototype sistem pendukung keputusan**
+        yang mengklasifikasikan risiko **Diabetes Mellitus**
+        menggunakan pendekatan *stacking ensemble* berbasis fitur terkompensasi.
+
+        - **Imputasi Median & Min–Max Scaling** untuk pra-pemrosesan data klinis  
+        - **Denoising Autoencoder (DAE)** untuk kompensasi fitur antar kelompok usia  
+        - **Stacking Ensemble** (Random Forest, XGBoost, KNN + Logistic Regression)
+          untuk meningkatkan akurasi dan stabilitas prediksi  
+
+        ---
+        **Author**  
+        Arwan Muhtada  
+        Program Studi Teknik
+
+
+
 
 
 
